@@ -1,0 +1,75 @@
+TRADING -
+	Dealers(buyer and seller) interact with broker
+
+TYPES OF FINANCIAL INSTRUMENTS - 
+	- STOCKS(i.e., equities or shares)
+	- DERIVATIVES
+	- DEBT(i.e., bonds and mortgages).
+
+TYPES OF TRADING -
+	- SPOT TRADING
+		- Stocks, Securities
+	- DERIVATIVE TRADING
+		- Commodities
+		- Futures
+
+EXCHANGE - 
+	 Highly Organized market where Broker and dealer come together and below mentioned entities( FINANCIL INSTRUMENTS ) are sold and bought - 
+		-	tradable securities, 
+		-	commodities, 
+				- e.g. gold, copper, iron, steal, wheat , cattle etc
+				https://en.wikipedia.org/wiki/List_of_traded_commodities
+		-	foreign exchange(FOREX),
+				https://en.wikipedia.org/wiki/Foreign_exchange_market 
+		-	futures
+				The parties initially agree to buy and sell an asset for a price agreed upon today (the forward price) with delivery and payment occurring at a future point, the delivery date
+		-	and options contracts 
+
+TYPES OF EXCHANGE -
+	- Stock/Securities Exchange
+	- Commodoties/Futures Exchange - Derivatives - Futures(generally commodoties are sold as futures) 
+	- Foreign Exchange
+
+INDIAN STOCK MARKET- 
+
+STOCK EXCHANGES 	- BSE(since 1875), NSE(since 1992 - starded trading 1994) - both List all major Indian Firms				- BOTH COMPETE for ORDER FLOW- leads to reduced costs, market efficiency and innovation. 
+The presence of ARBITRAGEURS keeps the prices on the two stock exchanges within a very tight range.
+
+BSE - 4700 firms - (500 firms constitute more than 90% capitalization, rest of them are ILLIQUID SHARES)
+NSE - 1200 firms 																										
+				NSE offers trading in the following segments:
+				- Equities
+					Equities - stocks
+					Indices
+					Mutual Funds
+					Exchange Traded Funds
+					Initial Public Offerings
+					Security Lending and Borrowing Scheme
+				- Derivatives
+					Equity Derivatives (including Global Indices like CNX 500, Dow Jones and FTSE )
+					Currency Derivatives
+					Interest Rate Futures
+				- Debt
+					Corporate Bonds
+
+Same trading mechanism, trading hours, settlement process
+	Trading Time 			- Monday to Friday 9:15AM IST  to 3:30 PM IST 
+	Transactions Settle 	- Settled 2 buissness days after they are made
+
+MARKET INDEXES 	- Sensex, S&P CNX Nifty
+	SENSEX - equities (includes 30 firms listed on BSE)
+	NIFTY - Shares(includes 50 firms listed on NSE)
+
+MARKET REGULATION
+The overall responsibility of development, regulation and supervision of the stock market rests with the Securities & Exchange Board of India (SEBI), which was formed in 1992 
+
+Indian Investor - 
+Foreign Investor - FDI(foreign Direct Investment), FPI(Foreign Portfolio Investment)
+		mainly consist of mutual funds, pension funds, endowments, sovereign wealth funds, insurance companies, banks, asset management companies etc
+		FDI - investor takes part in the day-to-day management and operations of the company, are treated as FDI
+		FPI - investments in shares without any control over management and operations, are treated as FPI.
+				Should be registered either as a foreign institutional investor (FII) or as one of the sub-accounts of one of the registered FIIs. 
+				Both registrations are granted by the market regulator, SEBI
+				E.G. Investment in securities in the primary and secondary markets, including shares, debentures and warrants of companies listed or to be listed on a recognized stock exchange in India.
+
+
