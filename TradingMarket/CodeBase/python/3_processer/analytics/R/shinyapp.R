@@ -27,6 +27,9 @@ library("quantmod")
 library("lmtest")
 library("dtw")
 library("tsoutliers")
+library("shinythemes")
+library("shiny")
+
 ############################################################################################
 #INPUT 
 ############################################################################################
@@ -53,13 +56,15 @@ symbols <- sort(names(redisHGetAll("SYMBOL")),decreasing = FALSE)
 
 #Initialize data structures
 key <- paste("CLOSE_",symbols[1],sep="")
-	raw_data<-redisHGetAll(key)
-	raw_data[names(raw_data)] <- as.numeric(raw_data[names(raw_data)])
-	sorted_data <- raw_data[order(unlist(names(raw_data)), decreasing=FALSE)]
-	data_matrix <- as.matrix(unlist(sorted_data))
-	close_merged<-as.data.frame(data_matrix)[,0]
-	low_merged<-as.data.frame(data_matrix)[,0]
-	high_merged<-as.data.frame(data_matrix)[,0]
+
+raw_data<-redisHGetAll(key)
+raw_data[names(raw_data)] <- as.numeric(raw_data[names(raw_data)])
+sorted_data <- raw_data[order(unlist(names(raw_data)), decreasing=FALSE)]
+data_matrix <- as.matrix(unlist(sorted_data))
+
+close_merged<-as.data.frame(data_matrix)[,0]
+low_merged<-as.data.frame(data_matrix)[,0]
+high_merged<-as.data.frame(data_matrix)[,0]
 
 #Function that helps merge data for all symbols in single dataframe - for comparative study
 mergefunc <- function(merged,key) {
@@ -144,7 +149,7 @@ for (symbol in symbols){
 	colnames(temp_col) <- symbol
 	final_acrossdaychange <- cbind(final_acrossdaychange, temp_col)		
 
-	if(min(asts) > 0 && quantile(asts)[2] > 1.5 && mean(asts) > 2){
+	if(min(asts) > 0 && quantile(asts)[2] > 1.0 && mean(asts) > 2){
 		final_rule1_satisfying_stocks <- cbind(final_rule1_satisfying_stocks, temp_col)				
 	}
 }
@@ -155,13 +160,17 @@ rownames(final_rule1_satisfying_stocks) <- row_names_final_acrossdaychange
 
 
 predictarima<- function(symb){
-	print(symb)
 	trainDataDays<-7
+	symb="PNB"
 	autoarimatraindata <- tail(final_low_high[symb],2*trainDataDays)
-	fit<-auto.arima(autoarimatraindata)
+	#fit<-auto.arima(autoarimatraindata)
+	fit<-HoltWinters(autoarimatraindata,gamma=FALSE)
+	summary(fit)
 	forecastvalues<-as.data.frame(forecast(fit,2))
 	
 	forecastvalues
+	#plot(autoarimatraindata)
+	#lines(as.ts(forecastvalues[,1]),col="red")
 	#predLow<-forecastvalues[1,1]
 	#predHigh<-forecastvalues[2,1]
 }
@@ -171,58 +180,68 @@ rownames(close_merged) <- NULL
 close_merged["date"] <- as.Date(close_merged$date, format = "%Y-%m-%d")
 
 
-
 ############################################################################################
 #OUPUT 
 #Interactive Use Interface
 ############################################################################################
 
+ui <- fluidPage(theme = "bootstrap.css",
+    #titlePanel("TRADING"),
+    fluidRow(
+        sidebarLayout(
+          sidebarPanel(
+            selectInput("symbol", "Symbol", choices = symbols)
+          ),
+          mainPanel(
+            fluidRow(
+              column(2,
+                checkboxInput('year', 'Year')
+              ),
+              column(3,
+                checkboxInput('2month', '2 Months')
+              ),
+              column(3,
+                checkboxInput('1month', '1 Month')
+              )
+            ),
+            fluidRow(
+              plotOutput("highlowplot")
+            )
+          )
+        )
+    ),
+    fluidRow(
+       tabsetPanel(
+          tabPanel("Ruel1", tableOutput("rule1result")),
+          tabPanel("Rule2", tableOutput("results"))
+        )
+    )
+#    fluidRow(
+#      "Rule2"
+#    )
+  )
 
-library(shiny)
-
-ui <- fluidPage(
-    titlePanel("TRADING"),
-    sidebarLayout(
-      sidebarPanel(
-        #sliderInput("priceInput", "Price", 0, 100, c(25, 40), pre = "$"),
-        #radioButtons("typeInput", "Product type",
-        #           choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
-        #           selected = "WINE"),
-        selectInput("symbol", "Symbol",
-                   choices = symbols)
-      ),	
-      mainPanel(plotOutput("highlowplot"),
-      	#plotOutput("prevlownexthighplot"),
-        tableOutput("arimaresults"),
-        tableOutput("results"),
-        #br(), br(),
-        tableOutput("rule1result")
-        #br(), br(),
-        #tableOutput("rule2result")
-	  )
-   )
- )
 
 server <- function(input, output, session) {
 
         output$highlowplot <- renderPlot({
-        	plot(as.ts(final_low_high[input$symbol]))
-        	#lines(as.ts(final_arima_prediction_values[input$symbol]),col="red")
-     	    #ggplot(filtered, aes(Alcohol_Content)) +
-       		#geom_histogram()
-   		})
+          plot(as.ts(final_low_high[input$symbol]))
+          #lines(as.ts(final_arima_prediction_values[input$symbol]),col="red")
+          #ggplot(filtered, aes(Alcohol_Content)) +
+          #geom_histogram()
+      })
 
         #output$prevlownexthighplot <- renderPlot({
-        	#plot(as.ts(final_prevdaylow_to_nextdayhigh[input$symbol]))
-        #	plot(tsclean(as.ts(final_low_high[input$symbol])))
-  		#})
+          #plot(as.ts(final_prevdaylow_to_nextdayhigh[input$symbol]))
+        # plot(tsclean(as.ts(final_low_high[input$symbol])))
+      #})
 
-   		output$arimaresults <- renderTable({
-           	predictarima(input$symbol)
+      output$arimaresults <- renderTable({
+            predictarima(input$symbol)
         })
 
-   		output$results <- renderTable({
-           	final_acrossdaychange[input$symbol]
+      output$results <- renderTable({
+            final_acrossdaychange[input$symbol]
         })
 
         output$rule1result <- renderTable({
@@ -230,7 +249,7 @@ server <- function(input, output, session) {
         })
 
         #output$rule2result <- renderTable({
-        #	final_arima_prediction_validation_score
+        # final_arima_prediction_validation_score
         #})
         
 }
