@@ -19,7 +19,8 @@ for symbol in symbols :
 	print symbol
 	filename = datadumppath+"New_nifty50_"+symbol+".csv"
 	#filename = "/home/gaurav/Harddisk/Office/TradingMarket/CodeBase/python/1_input_marketdatafetcher/../2_datadump/datadump/daily/New_nifty50_"+symbol+".csv"
-	inputjson =  ghdp.GoogleIntradayQuote(symbol,86400,360)
+	#inputjson =  ghdp.GoogleIntradayQuote(symbol,86400,360)
+	inputjson =  ghdp.GoogleInterdayQuote(symbol,86400,1)
 	inputjson.write_csv(filename)
 #df = pandas.read_json(inputjson)
 #print df

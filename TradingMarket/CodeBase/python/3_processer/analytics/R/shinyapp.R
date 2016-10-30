@@ -30,25 +30,25 @@ library("tsoutliers")
 library("shinythemes")
 library("shiny")
 
-############################################################################################
+####################################################################################################################################################################################
 #INPUT 
-############################################################################################
+####################################################################################################################################################################################
 #******************************** REDIS 
-############################################################################################
+####################################################################################################################################################################################
 redisConnect("127.0.0.1")
 
 #raw_data<-redisHGetAll("BHEL")
 #raw_data<-redisHGetAll("HINDALCO")
 #raw_data<-redisHGetAll("GAURAV")
 
-############################################################################################
+####################################################################################################################################################################################
 #******************************** CSV
-############################################################################################
+####################################################################################################################################################################################
 #raw_data<-read.csv("/home/gaurav/Desktop/Disk/Office/TradingMarket/CodeBase/python/2_datadump/datadump/nifty50.csv")
 
-############################################################################################
+####################################################################################################################################################################################
 #******************************** DATA PREPARATION
-############################################################################################
+####################################################################################################################################################################################
 #Prepare a Graph depicting all symbols
 #rediskeys <- redisKeys()
 
@@ -59,12 +59,12 @@ key <- paste("CLOSE_",symbols[1],sep="")
 
 raw_data<-redisHGetAll(key)
 raw_data[names(raw_data)] <- as.numeric(raw_data[names(raw_data)])
-sorted_data <- raw_data[order(unlist(names(raw_data)), decreasing=FALSE)]
-data_matrix <- as.matrix(unlist(sorted_data))
+data_matrix <- as.matrix(unlist(raw_data[order(unlist(names(raw_data)), decreasing=FALSE)]))
 
 close_merged<-as.data.frame(data_matrix)[,0]
 low_merged<-as.data.frame(data_matrix)[,0]
 high_merged<-as.data.frame(data_matrix)[,0]
+
 
 #Function that helps merge data for all symbols in single dataframe - for comparative study
 mergefunc <- function(merged,key) {
@@ -89,7 +89,7 @@ for (symbol in symbols){
 	high_merged <- mergefunc(high_merged,paste("MAX_",symbol,sep=""))
 }
 
-
+####################################################################################################################################################################################
 
 #USECASE 1 - graph for everyday's HIGH LOW
 final_low_high <- data.frame(1)
@@ -104,7 +104,16 @@ for (symbol in symbols){
 final_low_high[,1]	<- NULL
 #plot(as.ts(final_low_high["PNB"]))
 
+final_low_high_year <- final_low_high
+final_low_high_2month <- tail(final_low_high,120)
+final_low_high_1month <- tail(final_low_high,60)
 
+
+####################################################################################################################################################################################
+
+#USECASE 2 - 
+#		% changes in HIGH of previous day to LOW of next day
+#		% changes in LOW of previous day to HIGH of next day
 final_prevdaylow_to_nextdayhigh <- data.frame(1)
 final_prevdayhigh_to_nextdaylow <- data.frame(1)
 records <- nrow(final_low_high)
@@ -128,6 +137,8 @@ for (symbol in symbols){
 }
 final_prevdaylow_to_nextdayhigh[,1]	<- NULL
 final_prevdayhigh_to_nextdaylow[,1]	<- NULL
+
+####################################################################################################################################################################################
 
 #RULE1 - Mean, Variance
 #RULE DEFINITION
@@ -158,6 +169,7 @@ rownames(final_acrossdaychange) <- row_names_final_acrossdaychange
 final_rule1_satisfying_stocks[,1]	<- NULL
 rownames(final_rule1_satisfying_stocks) <- row_names_final_acrossdaychange
 
+####################################################################################################################################################################################
 
 predictarima<- function(symb){
 	trainDataDays<-7
@@ -180,40 +192,65 @@ rownames(close_merged) <- NULL
 close_merged["date"] <- as.Date(close_merged$date, format = "%Y-%m-%d")
 
 
-############################################################################################
+####################################################################################################################################################################################
 #OUPUT 
 #Interactive Use Interface
-############################################################################################
+####################################################################################################################################################################################
 
 ui <- fluidPage(theme = "bootstrap.css",
     #titlePanel("TRADING"),
     fluidRow(
         sidebarLayout(
           sidebarPanel(
-            selectInput("symbol", "Symbol", choices = symbols)
+            fluidRow(
+            	selectInput("symbol", "Symbol", choices = symbols)
+            ),
+            fluidRow(
+            	checkboxInput('plotarima', 'Plot Arima'),
+            	checkboxInput('plotholtwinter', 'Plot HoltWinter'),
+            	checkboxInput('plotrule1', 'Plot Rule1')
+            ),
+            fluidRow(
+              column(2,
+                checkboxInput('year1', 'Year')
+              ),
+              column(3,
+                checkboxInput('month21', '2 Months')
+              ),
+              column(3,
+                checkboxInput('month11', '1 Month')
+              )
+            )
           ),
           mainPanel(
             fluidRow(
-              column(2,
-                checkboxInput('year', 'Year')
-              ),
-              column(3,
-                checkboxInput('2month', '2 Months')
-              ),
-              column(3,
-                checkboxInput('1month', '1 Month')
-              )
+            	wellPanel(
+              		plotOutput("highlowplot")
+              	)
             ),
-            fluidRow(
-              plotOutput("highlowplot")
-            )
+           	fluidRow(
+          		column(4,
+          	 		radioButtons("dist", "Distribution type:",
+               			c("Year" = "year",
+                 		"2-Months" = "month2",
+                 		"1-Month" = "month1"),
+               			inline = TRUE),
+          	 		sliderInput("obs", "Number of observations:",  
+                    min = 1, max = 1000, value = 500)
+          		),
+          		column(8,
+          			wellPanel(
+          				selectInput("symbol", "Symbol", choices = symbols)
+          			)
+          		)
+          	)
           )
         )
     ),
     fluidRow(
        tabsetPanel(
-          tabPanel("Ruel1", tableOutput("rule1result")),
-          tabPanel("Rule2", tableOutput("results"))
+          tabPanel("Analytics for Symbol", tableOutput("results")),
+          tabPanel("SureShot1%", tableOutput("rule1result"))
         )
     )
 #    fluidRow(
@@ -225,10 +262,24 @@ ui <- fluidPage(theme = "bootstrap.css",
 server <- function(input, output, session) {
 
         output$highlowplot <- renderPlot({
-          plot(as.ts(final_low_high[input$symbol]))
-          #lines(as.ts(final_arima_prediction_values[input$symbol]),col="red")
-          #ggplot(filtered, aes(Alcohol_Content)) +
-          #geom_histogram()
+			switch(input$dist,
+                   year = plot(as.ts(final_low_high_year[input$symbol])),
+                   month2 = plot(as.ts(final_low_high_2month[input$symbol])),
+                   month1 = plot(as.ts(final_low_high_1month[input$symbol])),
+                   plot(as.ts(final_low_high_year[input$symbol])))
+
+        	#if(input$year) {
+          	#	plot(as.ts(final_low_high_year[input$symbol]))
+          	#}else if(input$month2) {
+			#	plot(as.ts(final_low_high_2month[input$symbol]))
+			#}else if(input$month1) {
+			#	plot(as.ts(final_low_high_1month[input$symbol]))
+          	#}else {
+          	#	plot(as.ts(final_low_high_year[input$symbol]))
+          	#}
+          	#lines(as.ts(final_arima_prediction_values[input$symbol]),col="red")
+          	#ggplot(filtered, aes(Alcohol_Content)) +
+          	#geom_histogram()
       })
 
         #output$prevlownexthighplot <- renderPlot({
@@ -255,3 +306,5 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui = ui, server = server)
+
+####################################################################################################################################################################################

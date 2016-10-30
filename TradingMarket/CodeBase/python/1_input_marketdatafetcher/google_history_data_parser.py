@@ -63,7 +63,7 @@ class Quote(object):
     return self.to_csv()
 
 class GoogleIntradayQuote(Quote):
-  ''' Intraday quotes from Google. Specify interval seconds and number of days '''
+  ''' Intraday quotes from Google. Specify interval seconds and number of days ,Max 60 days'''
   def __init__(self,symbol,interval_seconds=300,num_days=5):
     super(GoogleIntradayQuote,self).__init__()
     self.symbol = symbol.upper()
@@ -82,6 +82,26 @@ class GoogleIntradayQuote(Quote):
       dt = datetime.datetime.fromtimestamp(day+(interval_seconds*offset))
       self.append(dt,open_,high,low,close,volume)
    
+class GoogleInterdayQuote(Quote):
+  ''' Interday quotes from Google. Specify interval seconds and number of years ,Unlimited number of years'''
+  def __init__(self,symbol,interval_seconds=86400,num_years=5):
+    super(GoogleInterdayQuote,self).__init__()
+    self.symbol = symbol.upper()
+    url_string = "http://www.google.com/finance/getprices?q={0}&x=NSE".format(self.symbol)
+    url_string += "&i={0}&p={1}Y&f=d,o,h,l,c,v".format(interval_seconds,num_years)
+    csv = urllib.urlopen(url_string).readlines()
+    for bar in xrange(7,len(csv)):
+      if csv[bar].count(',')!=5: continue
+      offset,close,high,low,open_,volume = csv[bar].split(',')
+      if offset[0]=='a':
+        day = float(offset[1:])
+        offset = 0
+      else:
+        offset = float(offset)
+      open_,high,low,close = [float(x) for x in [open_,high,low,close]]
+      dt = datetime.datetime.fromtimestamp(day+(interval_seconds*offset))
+      self.append(dt,open_,high,low,close,volume)
+
    
 if __name__ == '__main__':
   q = GoogleIntradayQuote('PNB',60,30)
