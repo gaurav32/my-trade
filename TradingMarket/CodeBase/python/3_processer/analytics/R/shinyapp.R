@@ -57,6 +57,10 @@ worldstockexchangetimeings <- fromJSON(redisGet("WSI"))
 
 scheduledevents <- redisHGetAll("EVENTS")
 events <- colnames(as.data.frame(scheduledevents))
+allnews <- ""
+for(row in events){
+	allnews <- paste(row,allnews,sep="\n")
+}
 
 symbols <- sort(names(redisHGetAll("SYMBOL")),decreasing = FALSE)
 
@@ -248,7 +252,9 @@ ui <- fluidPage(theme = "bootstrap.css",
             		column(6,
             			wellPanel(
             				h5("Latest News"),
-            				tableOutput("latestnews")
+            				#tags$b("This text is bold.")
+            				#tags$marquee(tableOutput("latestnews"))
+            				HTML(paste("<marquee scrolldelay='150' direction='up'>",allnews,"</marquee>",sep=""))
             			)
             		),
             		column(6,
@@ -316,6 +322,9 @@ server <- function(input, output, session) {
         #geom_histogram()
     })
 
+    output$latestnews <- renderTable({
+		
+    })
     #output$prevlownexthighplot <- renderPlot({
         #plot(as.ts(final_prevdaylow_to_nextdayhigh[input$symbol]))
     #      plot(tsclean(as.ts(final_low_high[input$symbol])))
@@ -344,4 +353,8 @@ server <- function(input, output, session) {
 
 shinyApp(ui = ui, server = server)
 
+####################################################################################################################################################################################
+
+#References
+#https://daattali.com/shiny/timevis-demo/
 ####################################################################################################################################################################################
