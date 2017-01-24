@@ -275,7 +275,7 @@ ui <- fluidPage(theme = "bootstrap.css",
     				tabPanel("WorldMarketsToday",
    						wellPanel(
     						fluidRow(
-								timevisOutput("timeline")
+								#timevisOutput("timeline")
         					)
         				)
         			),
@@ -303,7 +303,7 @@ ui <- fluidPage(theme = "bootstrap.css",
         			tabPanel("IndiaCommodity",
    						wellPanel(
     						fluidRow(
-
+								timevisOutput("timeline")
         					)
         				)
         			)
