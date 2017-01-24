@@ -29,6 +29,7 @@ library("dtw")
 library("tsoutliers")
 library("shinythemes")
 library("shiny")
+library("timevis")
 
 ####################################################################################################################################################################################
 #INPUT 
@@ -51,6 +52,11 @@ redisConnect("127.0.0.1")
 ####################################################################################################################################################################################
 #Prepare a Graph depicting all symbols
 #rediskeys <- redisKeys()
+worldstockexchangetimeings <- fromJSON(redisGet("WSI"))
+
+
+scheduledevents <- redisHGetAll("EVENTS")
+events <- colnames(as.data.frame(scheduledevents))
 
 symbols <- sort(names(redisHGetAll("SYMBOL")),decreasing = FALSE)
 
@@ -145,12 +151,29 @@ final_prevdayhigh_to_nextdaylow[,1]	<- NULL
 #Min > 0, 25Percentile > 1%gain, Mean ~ 3%change ---------- Can earn you 2Rs on safer side
 final_acrossdaychange <- data.frame(1)
 final_rule1_satisfying_stocks <- data.frame(1)
-row_names_final_acrossdaychange <- rbind("Min","25%","Mean","Std. Devtn","75%","Max")
+row_names_final_acrossdaychange <- rbind("Y0%ile","2M0%ile","1M0%ile","Y%ile-S","2M%ile-S","1M%ile-S","Y%ile-0","2M%ile-0","1M%ile-0","Y%ile-0.75","2M%ile-0.75","1M%ile-0.75","Y%ile-1","2M%ile-1","1M%ile-1","Y%ile-1.5","2M%ile-1.5","1M%ile-1.5","Mean","Std. Devtn","75%ile","Max")
 for (symbol in symbols){
 	temp_col <- data.frame(Doubles=double())
 	asts <- as.ts(final_prevdaylow_to_nextdayhigh[symbol])
-	temp_col <- rbind(temp_col, min(asts))
-	temp_col <- rbind(temp_col, quantile(asts)[2])#25Percentile
+	#temp_col <- rbind(temp_col, min(asts))
+	temp_col <- rbind(temp_col, quantile(asts,0))
+	temp_col <- rbind(temp_col, quantile(tail(asts,60),0))
+	temp_col <- rbind(temp_col, quantile(tail(asts,30),0))
+	temp_col <- rbind(temp_col, ecdf(asts)(quantile(tail(asts,30),0)+.15)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,60))(quantile(tail(asts,30),0)+.15)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,30))(quantile(tail(asts,30),0)+.15)*100)
+	temp_col <- rbind(temp_col, ecdf(asts)(0)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,60))(0)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,30))(0)*100)
+	temp_col <- rbind(temp_col, ecdf(asts)(0.75)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,60))(0.75)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,30))(0.75)*100)
+	temp_col <- rbind(temp_col, ecdf(asts)(1)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,60))(1)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,30))(1)*100)
+	temp_col <- rbind(temp_col, ecdf(asts)(1.5)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,60))(1.5)*100)
+	temp_col <- rbind(temp_col, ecdf(tail(asts,30))(1.5)*100)
 	temp_col <- rbind(temp_col, mean(asts))
 	#temp_col <- rbind(temp_col, var(asts)[1])
 	temp_col <- rbind(temp_col, sd(asts))
@@ -168,6 +191,10 @@ final_acrossdaychange[,1]	<- NULL
 rownames(final_acrossdaychange) <- row_names_final_acrossdaychange
 final_rule1_satisfying_stocks[,1]	<- NULL
 rownames(final_rule1_satisfying_stocks) <- row_names_final_acrossdaychange
+
+predictarima<- function(data){
+
+}
 
 ####################################################################################################################################################################################
 
@@ -192,6 +219,18 @@ rownames(close_merged) <- NULL
 close_merged["date"] <- as.Date(close_merged$date, format = "%Y-%m-%d")
 
 
+worldstockexchangetimeings['content'] = worldstockexchangetimeings['StockExchangeSymbol']
+worldstockexchangetimeings['content'] = worldstockexchangetimeings['Country']
+worldstockexchangetimeings['start'] = worldstockexchangetimeings['Open']
+worldstockexchangetimeings['end'] = worldstockexchangetimeings['Close']
+
+data <- data.frame(
+	id      = 1:61,
+  	content = as.list(worldstockexchangetimeings['content']),
+  	start = as.list(worldstockexchangetimeings['start']),
+  	end = as.list(worldstockexchangetimeings['end'])
+)
+
 ####################################################################################################################################################################################
 #OUPUT 
 #Interactive Use Interface
@@ -200,109 +239,107 @@ close_merged["date"] <- as.Date(close_merged$date, format = "%Y-%m-%d")
 ui <- fluidPage(theme = "bootstrap.css",
     #titlePanel("TRADING"),
     fluidRow(
-        sidebarLayout(
-          sidebarPanel(
-            fluidRow(
-            	selectInput("symbol", "Symbol", choices = symbols)
-            ),
-            fluidRow(
-            	checkboxInput('plotarima', 'Plot Arima'),
-            	checkboxInput('plotholtwinter', 'Plot HoltWinter'),
-            	checkboxInput('plotrule1', 'Plot Rule1')
-            ),
-            fluidRow(
-              column(2,
-                checkboxInput('year1', 'Year')
-              ),
-              column(3,
-                checkboxInput('month21', '2 Months')
-              ),
-              column(3,
-                checkboxInput('month11', '1 Month')
-              )
-            )
-          ),
-          mainPanel(
-            fluidRow(
-            	wellPanel(
-              		plotOutput("highlowplot")
-              	)
-            ),
-           	fluidRow(
-          		column(4,
-          	 		radioButtons("dist", "Distribution type:",
-               			c("Year" = "year",
-                 		"2-Months" = "month2",
-                 		"1-Month" = "month1"),
-               			inline = TRUE),
-          	 		sliderInput("obs", "Number of observations:",  
-                    min = 1, max = 1000, value = 500)
-          		),
-          		column(8,
-          			wellPanel(
-          				selectInput("symbol", "Symbol", choices = symbols)
-          			)
-          		)
-          	)
-          )
-        )
-    ),
-    fluidRow(
-       tabsetPanel(
-          tabPanel("Analytics for Symbol", tableOutput("results")),
-          tabPanel("SureShot1%", tableOutput("rule1result"))
+        sidebarLayout(position = "right",
+        	sidebarPanel(
+            	fluidRow(
+	            	h5("NEWS FEED")
+    	        ),
+        	    fluidRow(
+            		column(6,
+            			wellPanel(
+            				h5("Latest News"),
+            				tableOutput("latestnews")
+            			)
+            		),
+            		column(6,
+	            		wellPanel(
+            	   			h5("Scheduled Events"),
+            	   			tableOutput("scheduledevent")
+            	   		)
+            		)            		
+            	),
+            	fluidRow(
+	            	wellPanel(
+            			h5("SENTIMETER")
+            		)
+            	)
+        	),
+        	mainPanel(
+        		tabsetPanel(
+    				tabPanel("WorldMarketsToday",
+   						wellPanel(
+    						fluidRow(
+								timevisOutput("timeline")
+        					)
+        				)
+        			),
+        			tabPanel("IndiaStocks",
+   						wellPanel(
+    						fluidRow(
+    							column(4,
+    								selectInput("symbol", "Symbol", choices = symbols)
+    							),
+    							column(8,
+    								wellPanel(
+    									plotOutput("highlowplot")
+    								)
+    							)
+        					)
+        				)
+        			),
+        			tabPanel("IndiaOptions",
+   						wellPanel(
+    						fluidRow(
+								selectInput("options", "Options", choices = symbols)
+        					)
+        				)
+        			),
+        			tabPanel("IndiaCommodity",
+   						wellPanel(
+    						fluidRow(
+
+        					)
+        				)
+        			)
+        		)
+        	)
         )
     )
-#    fluidRow(
-#      "Rule2"
-#    )
-  )
-
+)
 
 server <- function(input, output, session) {
 
-        output$highlowplot <- renderPlot({
-			switch(input$dist,
-                   year = plot(as.ts(final_low_high_year[input$symbol])),
-                   month2 = plot(as.ts(final_low_high_2month[input$symbol])),
-                   month1 = plot(as.ts(final_low_high_1month[input$symbol])),
-                   plot(as.ts(final_low_high_year[input$symbol])))
+    output$highlowplot <- renderPlot({
+        plot(as.ts(final_low_high[input$symbol]))
+        #lines(as.ts(final_arima_prediction_values[input$symbol]),col="red")
+        #ggplot(filtered, aes(Alcohol_Content)) +
+        #geom_histogram()
+    })
 
-        	#if(input$year) {
-          	#	plot(as.ts(final_low_high_year[input$symbol]))
-          	#}else if(input$month2) {
-			#	plot(as.ts(final_low_high_2month[input$symbol]))
-			#}else if(input$month1) {
-			#	plot(as.ts(final_low_high_1month[input$symbol]))
-          	#}else {
-          	#	plot(as.ts(final_low_high_year[input$symbol]))
-          	#}
-          	#lines(as.ts(final_arima_prediction_values[input$symbol]),col="red")
-          	#ggplot(filtered, aes(Alcohol_Content)) +
-          	#geom_histogram()
-      })
+    #output$prevlownexthighplot <- renderPlot({
+        #plot(as.ts(final_prevdaylow_to_nextdayhigh[input$symbol]))
+    #      plot(tsclean(as.ts(final_low_high[input$symbol])))
+    #})
 
-        #output$prevlownexthighplot <- renderPlot({
-          #plot(as.ts(final_prevdaylow_to_nextdayhigh[input$symbol]))
-        # plot(tsclean(as.ts(final_low_high[input$symbol])))
-      #})
+    #output$arimaresults <- renderTable({
+    #    predictarima(input$symbol)
+    #})
 
-      output$arimaresults <- renderTable({
-            predictarima(input$symbol)
-        })
+    #output$results <- renderTable({
+    #    final_acrossdaychange[input$symbol]
+    #})
 
-      output$results <- renderTable({
-            final_acrossdaychange[input$symbol]
-        })
+    #output$rule1result <- renderTable({
+    #    final_rule1_satisfying_stocks
+    #})
 
-        output$rule1result <- renderTable({
-            final_rule1_satisfying_stocks
-        })
+    #output$rule2result <- renderTable({
+    #      final_arima_prediction_validation_score
+    #})
 
-        #output$rule2result <- renderTable({
-        # final_arima_prediction_validation_score
-        #})
-        
+    output$timeline <- renderTimevis({
+    	timevis(data)
+  	})
 }
 
 shinyApp(ui = ui, server = server)
