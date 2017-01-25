@@ -1,0 +1,46 @@
+#install.packages("rredis")
+
+library("rredis")
+redisConnect("192.168.34.236")
+base_key = "I:6179125"
+#v = redisHGetAll("I:6179125")
+k = redisHKeys(base_key)
+print (k.size)
+#print(k[1])
+#print(k[[1]])
+#v = redisHGet(base_key, k[[1]])
+#print(v)
+for (key in k){
+#print (key[[1]])
+#v = redisHGet(base_key, key[[1]])
+#print(v)
+}
+
+
+KEY TO READ - 
+
+SYMBOL_ID:TIME_:SCORE_
+
+
+
+
+
+
+
+
+
+
+#GENEARATE VIEW
+
+# Create the data for the chart.
+v <- c(7,12,28,3,41)
+
+# Give the chart file a name.
+png(file = "line_chart.jpg")
+
+# Plot the bar chart. 
+plot(v,type = "o")
+
+# Save the file.
+dev.off()
+

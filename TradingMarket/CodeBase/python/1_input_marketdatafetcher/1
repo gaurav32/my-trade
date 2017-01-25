@@ -1,0 +1,53 @@
+from bs4 import BeautifulSoup
+import urllib2
+from lxml import etree
+import pandas as pd
+import lxml.html
+
+url = 'http://www.worldtimezone.com/markets24.php'
+conn = urllib2.urlopen(url)
+#html = conn.read()
+
+html = """
+  <table class="polosa" border="0" cellpadding="5" cellspacing="2" width="95%">
+    <tr valign="top">
+      <th>Tests</th>
+      <th>Failures</th>
+      <th>Success Rate</th>
+      <th>Average Time</th>
+      <th>Min Time</th>
+      <th>Max Time</th>
+   </tr>
+   <tr valign="top" class="Failure">
+     <td>103</td>
+     <td>24</td>
+     <td>76.70%</td>
+     <td>71 ms</td>
+     <td>0 ms</td>
+     <td>829 ms</td>
+  </tr>
+</table>"""
+
+html = conn.read()
+
+
+soup = BeautifulSoup(html)
+#table = soup.find_all({ "title" : "World Stock Exchanges with a corresponding time zone" })
+#tabulka = soup.find("table", {"class" : "polosa"})
+#print tabulka
+
+
+tables = soup.findAll("table")
+
+for table in tables:
+     print table
+     #if table.findParent("table") is None:
+     #    print str(table)
+
+tree = lxml.html.fromstring(html)
+table = tree.find_class("polosa")
+#print table
+
+
+#df = pd.read_html(str(table))[0]
+#print df
