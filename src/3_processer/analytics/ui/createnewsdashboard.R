@@ -5,11 +5,12 @@ library("shiny")
 drawnewsboard <- function(id, allnews){
 	# Create a namespace function using the provided id
 	ns <- NS(id)
-	wellPanel(
-       	fluidRow(
-          	h5("NEWS FEED")
-        ),
-  	fluidRow(
+#	wellPanel(
+	fluidRow(
+  		fluidRow(
+			headerPanel(
+				h5("NEWS FEED")
+			),
         		column(6,
             			wellPanel(
             				h5("Latest News"),
@@ -23,12 +24,17 @@ drawnewsboard <- function(id, allnews){
             	   			h5("Scheduled Events"),
             	   			tableOutput(ns("scheduledevent"))
             	   		)
-            		)            		
-        ),
-        fluidRow(
-	            	wellPanel(
-            			h5("SENTIMETER")
-            		)
-        )
+            		)            			
+		),
+        	fluidRow(
+			headerPanel(
+                                h5("SENTIMETER")
+                        ),
+			column(12,
+		            	wellPanel(
+            			
+            			)
+			)
+        	)
 	)
 }

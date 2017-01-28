@@ -1,6 +1,9 @@
 library("shiny")
+library("timelineprogress")
+#library("timevis")
+library(dygraphs)
 
-drawanalyticsdashboard <- function(id, symbols){
+drawanalyticsdashboardOutput <- function(id, symbols){
 	# Create a namespace function using the provided id
 	ns <- NS(id)
 
@@ -8,7 +11,7 @@ drawanalyticsdashboard <- function(id, symbols){
 		tabPanel("WorldMarketsToday",
 			wellPanel(
     				fluidRow(
-					#timevisOutput("timeline")
+					timelineprogressOutput(ns("worldmarketprogress"))
         			)
         		)
         	),	
@@ -20,7 +23,9 @@ drawanalyticsdashboard <- function(id, symbols){
 	    				),
     					column(8,
 	    					wellPanel(
-    							plotOutput(ns("highlowplot"))
+    							#plotOutput(ns("highlowplot"))
+							dygraph(nhtemp, main = "Stock Prices") %>%
+							dyRangeSelector(dateWindow = c("1920-01-01", "1921-01-01"))
 	    					)
     					)
 	        		)
@@ -36,9 +41,15 @@ drawanalyticsdashboard <- function(id, symbols){
        		tabPanel("IndiaCommodity",
    			wellPanel(
    				fluidRow(
-					#timevisOutput("timeline")
+#					timevisOutput(ns("timeline"))
   				)
         		)
         	)
 	)
+}
+
+drawanalyticsdashboard <- function(input, output, session, stringsAsFactors){
+	output$worldmarketprogress <- renderTimelineprogress({
+    		timelineprogress(data)
+  	})
 }

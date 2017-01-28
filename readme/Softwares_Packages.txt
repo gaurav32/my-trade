@@ -28,3 +28,38 @@ https://www.nseindia.com/products/content/equities/indices/nifty_next_50.htm
 
 pip install biosppy
 
+
+library("rredis")
+library("forecast")
+library("dtw")
+library("tseries")
+library("jsonlite")
+library("foreach")
+#library("doParallel")
+library("PerformanceAnalytics")
+library("ggplot2")
+library("reshape2")
+library("iterators")
+library("zoo")
+#library("seewave")
+library("adwave")
+library("biwavelet")
+library("brainwaver")
+library("futureheatwaves")
+library("mvcwt")
+library("seawaveQ")
+library("W2CWM2C")
+library("WaveletComp")
+library("wavethresh")
+library("wmtsa")
+library("AnalyzeTS")
+library("TTR")
+library("quantmod")
+library("lmtest")
+library("dtw")
+library("tsoutliers")
+library("shinythemes")
+library("shiny")
+library("timevis")
+
+
