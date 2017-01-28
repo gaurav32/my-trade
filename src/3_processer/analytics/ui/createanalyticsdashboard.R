@@ -24,11 +24,32 @@ drawanalyticsdashboardOutput <- function(id, symbols){
     					column(8,
 	    					wellPanel(
     							#plotOutput(ns("highlowplot"))
-							dygraph(nhtemp, main = "Stock Prices") %>%
+							#```{r, fig.width=6, fig.height=2.5}
+							dygraph(nhtemp, main = "Stock Prices", width="100%") %>%
 							dyRangeSelector(dateWindow = c("1920-01-01", "1921-01-01"))
+							#```
 	    					)
     					)
-	        		)
+	        		),
+				fluidRow(
+		          		column(4,
+		          	 		radioButtons(ns("dist"), "Distribution type:",
+	               					c("Year" = ns("year"),
+			                 		"2-Month" = ns("month2"),
+                			 		"1-Month" = ns("month1")),
+			               			inline = TRUE),
+		          	 		sliderInput(ns("obs"), "Number of observations:", min = 1, max = 1000, value = 500)
+		          		),
+          				column(8,
+		          			wellPanel(
+          						conditionalPanel(
+         							condition = "input.dist == 'month1'",
+         							sliderInput(ns("breakCount"), "Break Count", min=1, max=1000, value=10)
+		      					)
+          						#selectInput("symbol", "Symbol", choices = symbols)
+		          			)
+					)
+				)
        			)
 		),
         	tabPanel("IndiaOptions",
