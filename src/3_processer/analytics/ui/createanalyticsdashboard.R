@@ -3,7 +3,7 @@ library("timelineprogress")
 #library("timevis")
 library(dygraphs)
 
-drawanalyticsdashboardOutput <- function(id, symbols){
+drawanalyticsdashboardOutput <- function(id){
 	# Create a namespace function using the provided id
 	ns <- NS(id)
 
@@ -23,11 +23,11 @@ drawanalyticsdashboardOutput <- function(id, symbols){
 	    				),
     					column(8,
 	    					wellPanel(
-    							#plotOutput(ns("highlowplot"))
-							#```{r, fig.width=6, fig.height=2.5}
-							dygraph(nhtemp, main = "Stock Prices", width="100%") %>%
-							dyRangeSelector(dateWindow = c("1920-01-01", "1921-01-01"))
-							#```
+							#dygraphOutput(ns("dygraph"))
+							dygraph(as.ts(finalallstocklowhigh[symbol]), main = "Stock Prices", width="100%") #%>%
+#							dyRangeSelector(dateWindow = c("90", "100"))
+#							dygraph(nhtemp, main = "Stock Prices", width="100%") %>%
+							#dyRangeSelector(dateWindow = c("1920-01-01", "1921-01-01"))
 	    					)
     					)
 	        		),
@@ -43,10 +43,9 @@ drawanalyticsdashboardOutput <- function(id, symbols){
           				column(8,
 		          			wellPanel(
           						conditionalPanel(
-         							condition = "input.dist == 'month1'",
+         							condition = "input$dist == 'month1'",
          							sliderInput(ns("breakCount"), "Break Count", min=1, max=1000, value=10)
 		      					)
-          						#selectInput("symbol", "Symbol", choices = symbols)
 		          			)
 					)
 				)
@@ -73,4 +72,16 @@ drawanalyticsdashboard <- function(input, output, session, stringsAsFactors){
 	output$worldmarketprogress <- renderTimelineprogress({
     		timelineprogress(data)
   	})
+
+	#selectedsymbol <- reactive({
+  	#	as.ts(finalallstocklowhigh[input$symbol])
+	#})
+  
+
+	#output$dygraph <- renderDygraph({
+	#	as.ts(finalallstocklowhigh[input$symbol])
+	#	dygraph(selectedsymbol(), main = "Stock Prices", width="100%") #%>%
+#	      	dySeries(c("lwr", "fit", "upr"), label = "Deaths") %>%
+#	      	dyOptions(drawGrid = input$showgrid)
+	#})
 }

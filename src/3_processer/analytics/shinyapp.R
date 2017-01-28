@@ -8,6 +8,10 @@ redisConnect("127.0.0.1")
 
 source("ui/createanalyticsdashboard.R", chdir=TRUE)
 source("ui/createnewsdashboard.R", chdir=TRUE)
+source("strategy/R/getNifty50stocksdata.R", chdir=TRUE)
+
+finalallstocklowhigh <- getAllStockLowHigh()
+symbols <- getAllSymbols()
 
 worldstockexchangetimeings <- fromJSON(redisGet("WSI"))
 worldstockexchangetimeings['content'] = worldstockexchangetimeings['StockExchangeSymbol']
@@ -29,7 +33,7 @@ ui <- fluidPage(
    				drawnewsboard("newsboard","hello")
 			),
 			mainPanel(
-				drawanalyticsdashboardOutput("analyticsdashboard", "hello")
+				drawanalyticsdashboardOutput("analyticsdashboard")
     			)
 		)
   	),
