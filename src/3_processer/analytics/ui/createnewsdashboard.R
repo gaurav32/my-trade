@@ -8,10 +8,10 @@ drawnewsboardUI <- function(id, allnews){
 #	wellPanel(
 	fluidRow(
   		fluidRow(
-			headerPanel(
-				h5("NEWS FEED")
-			),
-        	column(6,
+			   headerPanel(
+				    h5("NEWS FEED")
+			   ),
+         column(6,
          		wellPanel(
         			h5("Latest News"),
            			#tags$b("This text is bold.")
@@ -19,22 +19,22 @@ drawnewsboardUI <- function(id, allnews){
           			HTML(paste("<marquee scrolldelay='150' direction='up'>",allnews,"</marquee>",sep=""))
            		)
          	),
-            column(6,
-	    		wellPanel(
+          column(6,
+	    		  wellPanel(
     	   			h5("Scheduled Events"),
       	   			tableOutput(ns("scheduledevent"))
         	   	)
            	)            			
-		),
-        fluidRow(
-			headerPanel(
+		      ),
+          fluidRow(
+			        headerPanel(
                 h5("SENTIMETER")
-            ),
-			column(12,
+              ),
+			        column(12,
                	wellPanel(
             			
-    			)
-			)
+    			    )
+			    )
     	)
 	)
 }

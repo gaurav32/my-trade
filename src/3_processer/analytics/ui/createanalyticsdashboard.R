@@ -82,3 +82,29 @@ drawanalyticsdashboard <- function(input, output, session, stringsAsFactors) {
 		#dyRangeSelector(dateWindow = c("1920-01-01", "1921-01-01"))
   	})
 }
+
+drawanalyticsdataUI <- function(id){
+	# Create a namespace function using the provided id
+	ns <- NS(id)
+
+	wellPanel(
+		fluidRow(
+        	column(12,
+          		dataTableOutput(ns('datatable'))
+        	)
+      	)
+	)
+
+}
+
+drawanalyticsdata <- function(input, output, session, stringsAsFactors) {
+
+	observe({
+    	msg <- sprintf("Updating Analytics data....")
+    	cat(msg, "\n")
+  	})
+
+	output$datatable <- renderDataTable({
+		sureshotprofitstocks
+	})
+}

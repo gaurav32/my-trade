@@ -11,8 +11,10 @@ source("ui/createnewsdashboard.R", chdir=TRUE)
 source("strategy/R/getNifty50stocksdata.R", chdir=TRUE)
 source("strategy/R/getSureshotProfitStocks.R", chdir=TRUE)
 
+finalallstocklow <- getAllStockLow()
+finalallstockhigh <- getAllStockHigh()
 finalallstocklowhigh <- getAllStockLowHigh()
-sureshotprofitstocks <- getsureshotprofitstocks(finalallstocklowhigh)
+sureshotprofitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh)
 
 symbols <- getAllSymbols()
 
@@ -43,13 +45,14 @@ ui <- fluidPage(
   	),
 	fluidRow(
 		wellPanel(
-		
+			drawanalyticsdataUI("analyticsdata")
 		)
 	)
 )
 
 server <- function(input, output, session) {
 	generateanalyticsdashboard <- callModule(drawanalyticsdashboard, "analyticsdashboard", stringsAsFactors = FALSE)
+	generateanalyticsdata <- callModule(drawanalyticsdata, "analyticsdata", stringsAsFactors = FALSE)
 }
 
 shinyApp(ui, server)

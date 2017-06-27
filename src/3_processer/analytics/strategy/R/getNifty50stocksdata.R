@@ -76,3 +76,10 @@ getAllStockLowHigh <- function(){
 	final_low_high
 }
 
+getAllStockLow <- function(){
+	low_merged
+}
+
+getAllStockHigh <- function(){
+	high_merged
+}
