@@ -14,7 +14,18 @@ source("strategy/R/getSureshotProfitStocks.R", chdir=TRUE)
 finalallstocklow <- getAllStockLow()
 finalallstockhigh <- getAllStockHigh()
 finalallstocklowhigh <- getAllStockLowHigh()
-sureshotprofitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh)
+gainpercent <- 0.01
+sureshot1profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh, gainpercent)
+gainpercent <- 0.02
+sureshot2profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh, gainpercent)
+gainpercent <- 0.03
+sureshot3profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh, gainpercent)
+gainpercent <- 0.04
+sureshot4profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh, gainpercent)
+gainpercent <- 0.05
+sureshot5profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstockhigh, gainpercent)
+
+sureshotprofitstocks <- sureshot1profitstocks
 
 symbols <- getAllSymbols()
 

@@ -20,7 +20,15 @@ drawanalyticsdashboardUI <- function(id){
 			wellPanel(
 				fluidRow(
 					column(4,
-    					selectInput(ns("symbol"), "Symbol", choices = symbols)
+    					selectInput(ns("symbol"), "Symbol", choices = symbols),
+    					radioButtons(ns("stockanalytics"), "StockAnalytics :",
+	               				c("Stock Low High Prices" = "stocklowhighprice",
+	               				"SureShot1% Across Day" = "sureshot1percent",
+                			 	"SureShot2% Across Day" = "sureshot2percent",
+                			 	"SureShot3% Across Day" = "sureshot3percent",
+                			 	"SureShot4% Across Day" = "sureshot4percent",
+                			 	"SureShot5% Across Day" = "sureshot5percent"),
+			               		inline = TRUE)
 	    			),
     				column(8,
 	    				wellPanel(
@@ -31,9 +39,9 @@ drawanalyticsdashboardUI <- function(id){
 				fluidRow(
 		          	column(4,
 		          		radioButtons(ns("dist"), "Distribution type:",
-	               				c("Year" = ns("year"),
-			                	"2-Month" = ns("month2"),
-                			 	"1-Month" = ns("month1")),
+	               				c("Year" = "year",
+			                	"2-Month" = "month2",
+                			 	"1-Month" = "month1"),
 			               		inline = TRUE),
 		          	 	sliderInput(ns("obs"), "Number of observations:", min = 1, max = 1000, value = 500)
 		          	),
@@ -76,11 +84,19 @@ drawanalyticsdashboard <- function(input, output, session, stringsAsFactors) {
   	})
 
 	output$stockgraph <- renderDygraph({
-		dygraph(as.ts(finalallstocklowhigh[input$symbol]), main = "Stock Prices", width="100%") #%>%
-		#dyRangeSelector(dateWindow = c("90", "100"))
-		#dygraph(nhtemp, main = "Stock Prices", width="100%") %>%
-		#dyRangeSelector(dateWindow = c("1920-01-01", "1921-01-01"))
+
+		type <- input$stockanalytics
+  		switch(type,
+  			stocklowhighprice = dygraph(as.ts(finalallstocklowhigh[input$symbol]), main = "Stock Prices", width="100%"), #%>%, 
+       		sureshot1percent = dygraph(as.ts(sureshot1profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
+  			sureshot2percent = dygraph(as.ts(sureshot2profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
+       		sureshot3percent = dygraph(as.ts(sureshot3profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
+  			sureshot4percent = dygraph(as.ts(sureshot4profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
+       		sureshot5percent = dygraph(as.ts(sureshot5profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
+  		)
+
   	})
+
 }
 
 drawanalyticsdataUI <- function(id){

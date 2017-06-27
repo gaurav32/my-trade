@@ -1,9 +1,8 @@
 #######################################################################################################################################
 
-getsureshotprofitstocks <- function(finalallstocklow, finalallstockhigh){
+getsureshotprofitstocks <- function(finalallstocklow, finalallstockhigh, gainpercent){
 	#######################################################################################################################################
-	gainpercent <- 0.10
-	symbols <- as.list("BHEL")
+	#symbols <- as.list("BHEL")
 	final_prevdaylow_to_nextdayhigh <- data.frame(1)
 	for (symbol in symbols){
 		tryCatch({
@@ -19,24 +18,15 @@ getsureshotprofitstocks <- function(finalallstocklow, finalallstockhigh){
 						break
 					price <- as.double(highdata[highrowIndx])
 					if (price > baseprice){
-						print(c("found compare", lowrowIndx, highrowIndx, "Prices : ",baseprice, price))
+						#print(c("found compare", lowrowIndx, highrowIndx, "Prices : ",baseprice, price))
 						final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol] <- 1
 						break
 					} else{
-						print(c("not found compare", lowrowIndx, highrowIndx, "Prices : ",baseprice, price))
+						#print(c("not found compare", lowrowIndx, highrowIndx, "Prices : ",baseprice, price))
 						final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol] <- final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol] + 1
 					}
 				}
 			}
-			#for (lowrowIndx in 1:lowrecords){
-			#	if(!is.na(final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol])){
-			#		val <- as.numeric(final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol])
-			#		if(val != 1){
-			#			final_prevdaylow_to_nextdayhigh[,symbol] <- NULL
-			#			break
-			#		}
-			#	}
-			#}
 		}, warning = function(war) {
 
 		}, error = function(err) {
@@ -46,5 +36,21 @@ getsureshotprofitstocks <- function(finalallstocklow, finalallstockhigh){
 		}) # END tryCatch
 	}
 	final_prevdaylow_to_nextdayhigh[,1] <- NULL
+	executesureshotprofitstocksdefinition(final_prevdaylow_to_nextdayhigh)
+}
+
+executesureshotprofitstocksdefinition <- function(final_prevdaylow_to_nextdayhigh){
+	for (symbol in symbols){
+		#for (lowrowIndx in 1:lowrecords){
+			#	if(!is.na(final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol])){
+			#		val <- as.numeric(final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol])
+			#		if(val != 1){
+			#			final_prevdaylow_to_nextdayhigh[,symbol] <- NULL
+			#			break
+			#		}
+			#	}
+		#}
+		#print(result)
+	}
 	final_prevdaylow_to_nextdayhigh
 }
