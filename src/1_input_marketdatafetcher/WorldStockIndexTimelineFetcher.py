@@ -9,7 +9,7 @@ import pytz
 import redis
 import json
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+r = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
 
 fmt = '%Y-%m-%d %H:%M:%S'
 
@@ -47,5 +47,4 @@ for index,row in df.iterrows():
 	detail = {'WorldStockExchangeName': row["WorldStockExchangeName"], 'StockExchangeSymbol': row["StockExchangeSymbol"], 'Country': row["Country"], 'Open': row["Open"], 'Close': row["Close"],}	
 	details.append(detail)
 #	r.hset("WSI", row['StockExchangeSymbol'], json.dumps(details, default=myconverter))
-r.set("WSI",json.dumps(details, default=myconverter))    
-
+r.set("WSI",json.dumps(details, default=myconverter))
