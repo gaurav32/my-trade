@@ -87,19 +87,32 @@ drawanalyticsdashboard <- function(input, output, session, stringsAsFactors) {
 	output$stockgraph <- renderDygraph({
 
     sureshot1percentdata <- as.xts(as.ts(sureshot1profitstocks[input$symbol]))
-    everydayhighlowdiffpercentdata <- as.xts(as.ts(everydayhighlowdiffpercent[input$symbol]))
     colnames(sureshot1percentdata)[1] <- "sureshot1percentdata"
+    sureshot2percentdata <- as.xts(as.ts(sureshot2profitstocks[input$symbol]))
+    colnames(sureshot2percentdata)[1] <- "sureshot2percentdata"
+    sureshot3percentdata <- as.xts(as.ts(sureshot3profitstocks[input$symbol]))
+    colnames(sureshot3percentdata)[1] <- "sureshot3percentdata"
+    sureshot4percentdata <- as.xts(as.ts(sureshot4profitstocks[input$symbol]))
+    colnames(sureshot4percentdata)[1] <- "sureshot4percentdata"
+    sureshot5percentdata <- as.xts(as.ts(sureshot5profitstocks[input$symbol]))
+    colnames(sureshot5percentdata)[1] <- "sureshot5percentdata"
+
+    everydayhighlowdiffpercentdata <- as.xts(as.ts(everydayhighlowdiffpercent[input$symbol]))
     colnames(everydayhighlowdiffpercentdata)[1] <- "everydayhighlowdiffpercentdata"
-    datacompare <- cbind(sureshot1percentdata=sureshot1percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
+    datacompare1 <- cbind(sureshot1percentdata=sureshot1percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
+    datacompare2 <- cbind(sureshot2percentdata=sureshot2percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
+    datacompare3 <- cbind(sureshot3percentdata=sureshot3percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
+    datacompare4 <- cbind(sureshot4percentdata=sureshot4percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
+    datacompare5 <- cbind(sureshot5percentdata=sureshot5percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
 
 		type <- input$stockanalytics
   		switch(type,
   			stocklowhighprice = dygraph(as.ts(finalallstocklowhigh[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
-       	sureshot1percent = dygraph(datacompare, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot1percentdata", label = "TodayLow_TommorowHigh") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodayLow_TodayHigh") %>% dyRangeSelector(),
-  			sureshot2percent = dygraph(as.ts(sureshot2profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
-       	sureshot3percent = dygraph(as.ts(sureshot3profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
-  			sureshot4percent = dygraph(as.ts(sureshot4profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
-       	sureshot5percent = dygraph(as.ts(sureshot5profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
+       	sureshot1percent = dygraph(datacompare1, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot1percentdata", label = "TodLow_TomHigh_1%_inDays") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodLow_TodHigh") %>% dyRangeSelector(),
+  			sureshot2percent = dygraph(datacompare2, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot2percentdata", label = "TodLow_TomHigh_2%_inDays") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodLow_TodHigh") %>% dyRangeSelector(),
+       	sureshot3percent = dygraph(datacompare3, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot3percentdata", label = "TodLow_TomHigh_3%_inDays") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodLow_TodHigh") %>% dyRangeSelector(),
+  			sureshot4percent = dygraph(datacompare4, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot4percentdata", label = "TodLow_TomHigh_4%_inDays") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodLow_TodHigh") %>% dyRangeSelector(),
+       	sureshot5percent = dygraph(datacompare5, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot5percentdata", label = "TodLow_TomHigh_5%_inDays") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodLow_TodHigh") %>% dyRangeSelector(),
   		)
 
   	})
