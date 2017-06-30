@@ -11,6 +11,8 @@ source("ui/createnewsdashboard.R", chdir=TRUE)
 source("strategy/R/getNifty50stocksdata.R", chdir=TRUE)
 source("strategy/R/getSureshotProfitStocks.R", chdir=TRUE)
 
+symbols <- getAllSymbols()
+
 finalallstocklow <- getAllStockLow()
 finalallstockhigh <- getAllStockHigh()
 finalallstocklowhigh <- getAllStockLowHigh()
@@ -27,7 +29,9 @@ sureshot5profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstock
 
 sureshotprofitstocks <- sureshot1profitstocks
 
-symbols <- getAllSymbols()
+everydayhighlowdiffpercent <- geteverydayhighlowdiffpercent(finalallstocklow, finalallstockhigh)
+
+
 
 
 worldstockexchangetimeings <- fromJSON(redisGet("WSI"))

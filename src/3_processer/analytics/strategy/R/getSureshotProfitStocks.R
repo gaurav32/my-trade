@@ -15,7 +15,7 @@ getsureshotprofitstocks <- function(finalallstocklow, finalallstockhigh, gainper
 				baseprice <- as.double(1+gainpercent)*as.double(lowdata[lowrowIndx])
 				for (highrowIndx in (lowrowIndx+1):highrecords){
 					if(highrowIndx > highrecords)
-						break
+						final_prevdaylow_to_nextdayhigh[lowrowIndx,symbol] <- 1
 					price <- as.double(highdata[highrowIndx])
 					if (price > baseprice){
 						#print(c("found compare", lowrowIndx, highrowIndx, "Prices : ",baseprice, price))
@@ -53,4 +53,32 @@ executesureshotprofitstocksdefinition <- function(final_prevdaylow_to_nextdayhig
 		#print(result)
 	}
 	final_prevdaylow_to_nextdayhigh
+}
+
+
+geteverydayhighlowdiffpercent <- function(finalallstocklow, finalallstockhigh, gainpercent){
+	#######################################################################################################################################
+	#symbols <- as.list("BHEL")
+	final_daylow_to_dayhigh <- data.frame(1)
+	for (symbol in symbols){
+		tryCatch({
+			lowdata <- as.list(finalallstocklow[,paste("MIN_",symbol,sep="")])
+			highdata <- as.list(finalallstockhigh[,paste("MAX_",symbol,sep="")])
+			lowrecords <- length(lowdata)
+			for (lowrowIndx in 1:lowrecords){
+				baseprice <- as.double(lowdata[lowrowIndx])
+				price <- as.double(highdata[lowrowIndx])
+				diffpercent <- as.double((price - baseprice)*(100/baseprice))
+				final_daylow_to_dayhigh[lowrowIndx,symbol] <- diffpercent
+			}
+		}, warning = function(war) {
+
+		}, error = function(err) {
+    		
+		}, finally = {
+			next
+		}) # END tryCatch
+	}
+	final_daylow_to_dayhigh[,1] <- NULL
+	final_daylow_to_dayhigh
 }

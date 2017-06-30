@@ -3,6 +3,7 @@ library("timelineprogress")
 #library("timevis")
 library("dygraphs")
 library("ggplot2")
+library("xts")
 
 drawanalyticsdashboardUI <- function(id){
 	# Create a namespace function using the provided id
@@ -85,14 +86,20 @@ drawanalyticsdashboard <- function(input, output, session, stringsAsFactors) {
 
 	output$stockgraph <- renderDygraph({
 
+    sureshot1percentdata <- as.xts(as.ts(sureshot1profitstocks[input$symbol]))
+    everydayhighlowdiffpercentdata <- as.xts(as.ts(everydayhighlowdiffpercent[input$symbol]))
+    colnames(sureshot1percentdata)[1] <- "sureshot1percentdata"
+    colnames(everydayhighlowdiffpercentdata)[1] <- "everydayhighlowdiffpercentdata"
+    datacompare <- cbind(sureshot1percentdata=sureshot1percentdata, everydayhighlowdiffpercentdata=everydayhighlowdiffpercentdata)
+
 		type <- input$stockanalytics
   		switch(type,
-  			stocklowhighprice = dygraph(as.ts(finalallstocklowhigh[input$symbol]), main = "Stock Prices", width="100%"), #%>%, 
-       		sureshot1percent = dygraph(as.ts(sureshot1profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
-  			sureshot2percent = dygraph(as.ts(sureshot2profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
-       		sureshot3percent = dygraph(as.ts(sureshot3profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
-  			sureshot4percent = dygraph(as.ts(sureshot4profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
-       		sureshot5percent = dygraph(as.ts(sureshot5profitstocks[input$symbol]), main = "Stock Prices", width="100%"), #%>%,
+  			stocklowhighprice = dygraph(as.ts(finalallstocklowhigh[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
+       	sureshot1percent = dygraph(datacompare, main = "Stock Prices Trend", width="100%") %>% dySeries("sureshot1percentdata", label = "TodayLow_TommorowHigh") %>% dySeries("everydayhighlowdiffpercentdata", label = "TodayLow_TodayHigh") %>% dyRangeSelector(),
+  			sureshot2percent = dygraph(as.ts(sureshot2profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
+       	sureshot3percent = dygraph(as.ts(sureshot3profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
+  			sureshot4percent = dygraph(as.ts(sureshot4profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
+       	sureshot5percent = dygraph(as.ts(sureshot5profitstocks[input$symbol]), main = "Stock Prices", width="100%") %>% dyRangeSelector(),
   		)
 
   	})
