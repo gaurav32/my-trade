@@ -45,7 +45,7 @@ worldstockexchangetimeings['start'] = worldstockexchangetimeings['Open']
 worldstockexchangetimeings['end'] = worldstockexchangetimeings['Close']
 
 data <- data.frame(
-	id      = 1:61,
+	id      = 1:64,
     content = as.list(worldstockexchangetimeings['content']),
     start = as.list(worldstockexchangetimeings['start']),
     end = as.list(worldstockexchangetimeings['end'])
