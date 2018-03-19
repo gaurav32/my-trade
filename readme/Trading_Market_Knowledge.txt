@@ -73,3 +73,60 @@ Foreign Investor - FDI(foreign Direct Investment), FPI(Foreign Portfolio Investm
 				E.G. Investment in securities in the primary and secondary markets, including shares, debentures and warrants of companies listed or to be listed on a recognized stock exchange in India.
 
 
+1>		- Corresponding CALL -	above current price - market expected to go UP
+		TODAY's NIFTY INDEX Price 8200 	, say i want to buy 300 options				
+		I Expect NIFTY to RISE 	- rise till 8600		TODAY 8600 Option available at Premium 20Rs(CP :  6000)	--	as NIFTY rises to 8600 Option Premium would INCREASE, say 20RS(SP : 6000)																																									GAIN:6000-3000 = 3000
+		 						- rise till 8500		TODAY 8500 Option available at Premium 30Rs(CP :  9000)	--	as NIFTY rises to 8500 Option Premium would INCREASE, say 20RS(SP : 6000)	
+		 						- rise till 8400		TODAY 8400 Option available at Premium 40Rs(CP : 12000)	--	as NIFTY rises to 8400 Option Value would INCREASE, say 20RS(SP : 6000)	
+		 						- rise till 8300		TODAY 8300 Option available at Premium 50Rs(CP : 15000)	--	as NIFTY rises to 8300 Option Value would INCREASE, say 20RS(SP : 6000)	
+		 															DECREASING ORDER(as it is not expected to rise that much)				INCREASES - (Based on Implied Volatility)			
+		 																																		Time Left for Expiration
+		 																																		Probability to reach this Pitstop				
+		 																																			- 	Price
+		 																																			- 	Volatility
+
+				 ---------------------------------------------------------- CURRENT PRICE ----------------------------------------------------------
+
+		- Corresponding PUT -	below current price - market expected to go DOWN
+		TODAY's NIFTY INDEX Price 8200 	, say i want to buy 300 options				
+		I Expect NIFTY to FALL 	- fall till 8100		TODAY 8100 Option available at Premium 50Rs(CP : 15000)	--	as NIFTY falls to 8100 Option Premium would INCREASE, say 20RS(SP : 6000)																																									GAIN:6000-3000 = 3000
+		 						- fall till 8000		TODAY 8000 Option available at Premium 40Rs(CP : 12000)	--	as NIFTY falls to 8000 Option Premium would INCREASE, say 20RS(SP : 6000)	
+		 						- fall till 7900		TODAY 7900 Option available at Premium 30Rs(CP :  9000)	--	as NIFTY falls to 7900 Option Premium would INCREASE, say 20RS(SP : 6000)	
+		 						- fall till 7800		TODAY 7800 Option available at Premium 20Rs(CP :  6000)	--	as NIFTY falls to 7800 Option Premium would INCREASE, say 20RS(SP : 6000)	
+		 															DECREASING ORDER(as it is not expected to fall this much)				INCREASES - (Based on Implied Volatility)			
+
+
+2>		What are Option Greeks ? 
+
+		The price of an Option depends on certain factors like 
+			price 
+			volatility of the underlying, 
+			time to expiry etc. 
+
+		The Option Greeks are the tools that measure the sensitivity of the option price to the above-mentioned factors. 
+		They are often used by professional traders for trading and managing the risk of large positions in options and stocks.These Option Greeks are: 
+
+Delta : is the option Greek that measures the estimated change in option premium/price for a change in the price of the underlying.
+
+		Put option deltas always range from -1 to 0 
+			because as the underlying security increases, the value of put options decrease. 
+			E.g. - if a put option has a delta of -0.33, if the price of the underlying asset increases by $1, the price of the put option will decrease by $0.33.
+		The delta for a call option always ranges from 0 to 1,
+			because as the underlying asset increases in price, call options increase in price. 
+
+		Technically, the value of the option's delta is the first derivative of the value of option with respect to the underlying security's Price		
+
+
+Gamma : measures the estimated change in the Delta of an option for a change in the price of the underlying
+
+Vega : measures the estimated change in the option price for a change in the volatility of the underlying. 
+
+Theta : measures the estimated change in the option price for a change in the time to option expiry. 
+
+Rho : measures the estimated change in the option price for a change in the risk free interest rates. 
+
+Volatility : A measure of stock price fluctuation. Mathematically, volatility is the annualized standard deviation of a stock's daily price changes.
+
+Premium : is the price of an option and is equal to its intrinsic value plus time value. 
+
+Theoretical value : The estimated value of an option derived from a mathematical model.

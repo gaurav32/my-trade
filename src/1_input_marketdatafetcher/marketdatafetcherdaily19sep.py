@@ -9,6 +9,7 @@ symbols = ["ACC","ADANIPORTS","AMBUJACEM","ASIANPAINT","AUROPHARMA","AXISBANK","
 #symbol = "BHEL"
 
 datadumppath = "../2_datadump/datadump/daily/"
+datadumpminutewisepath = "../2_datadump/datadump/minutewise/"
 
 filelist = [ f for f in os.listdir(datadumppath) if f.endswith(".csv") ]
 for f in filelist:
@@ -25,3 +26,16 @@ for symbol in symbols :
 #df = pandas.read_json(inputjson)
 #print df
 #df.to_csv(filename)
+
+filelist = [ f for f in os.listdir(datadumpminutewisepath) if f.endswith(".csv") ]
+for f in filelist:
+    print datadumpminutewisepath+f
+    os.remove(datadumpminutewisepath+f)
+    
+for symbol in symbols :
+	print symbol
+	filename = datadumpminutewisepath+"Today_Yesterday_nifty50_"+symbol+".csv"
+	#filename = "/home/gaurav/Harddisk/Office/TradingMarket/CodeBase/python/1_input_marketdatafetcher/../2_datadump/datadump/daily/New_nifty50_"+symbol+".csv"
+	#inputjson =  ghdp.GoogleIntradayQuote(symbol,86400,360)
+	inputjson =  ghdp.GoogleIntradayQuote(symbol,60,2)
+	inputjson.write_csv(filename)

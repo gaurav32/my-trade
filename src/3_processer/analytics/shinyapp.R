@@ -30,9 +30,13 @@ sureshot5profitstocks <- getsureshotprofitstocks(finalallstocklow, finalallstock
 sureshotprofitstocks <- sureshot1profitstocks
 
 everydayhighlowdiffpercent <- geteverydayhighlowdiffpercent(finalallstocklow, finalallstockhigh)
+##yesterdaylowtotodaydhighdiffpercent <- getyesterdaylowtotodaydhighdiffpercent(finalallstocklow, finalallstockhigh)
+##todaylowtoyesterdaydhighdiffpercent <- gettodaylowtoyesterdaydhighdiffpercent(finalallstocklow, finalallstockhigh)
 
+profitpercentageprobability <- getprofitpercentageprobability(finalallstocklow, finalallstockhigh)
 
-
+symbols <- as.list(c("BHEL","PNB","BANKBARODA","IDEA"))
+getConfidentPredictionGoodStocks(everydayhighlowdiffpercent,finalallstocklow, finalallstockhigh, symbols)
 
 worldstockexchangetimeings <- fromJSON(redisGet("WSI"))
 worldstockexchangetimeings['content'] = worldstockexchangetimeings['StockExchangeSymbol']
