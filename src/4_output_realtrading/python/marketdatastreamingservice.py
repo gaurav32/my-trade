@@ -26,31 +26,65 @@ bypass_trading_window = True
 symbols = ["NIFTY","BHEL","BANKBARODA"]
 ###############################################################################################################
 def load365DayWiseData(symbols):
-	return 0
+	df = []
+	for symbol in symbols :
+		filename = "New_nifty50_"+symbol+".csv"
+		print filename
+		frames = pandas.read_csv(filename)
+		df.append(frames)
+	result = pandas.concat(df)		
+	return result
 
 def load90DayMinuteWiseData(symbols):
-	return 0
+	df = []
+	for symbol in symbols :
+		filename = "Today_Yesterday_nifty50_"+symbol+".csv"
+		print filename
+		frames = pandas.read_csv(filename)
+		df.append(frames)
+	result = pandas.concat(df)		
+	return result
 
+os.chdir("../../2_datadump/datadump/daily/")
 daywisedata = load365DayWiseData(symbols)
+os.chdir("../minutewise/")
 minutewisedata = load90DayMinuteWiseData(symbols)
+os.chdir("../../../")
 ###############################################################################################################
-def check_rule1(today_minute_data):
+def check_rule1(today_minute_data, symbol):
+	#If Today's current_low falls below yesterday's low
+	# & I know Today High Low would be atleast 1%
+	# & with yesterday low - today-low correlation of .99 and 20 percent chance of diff being less than 0.5%
+	# & today's high(today's predicted low + 1%) would come after today's low in chosen class
+	# & I know even If Today's High is already higher than yesterday's low - I would cover 1% tommorow
+	#yesterdate_date = 
+	msg = ''
+	yesterday_date = daywisedata[daywisedata.symbol == symbol].iloc[-1]['date'] 
+	yesterday_low = float(daywisedata[daywisedata.symbol == symbol].iloc[-1]['low'])
+	current_low = float(today_minute_data.iloc[-1]['low'])
+	if yesterday_low*0.995 > current_low:
+		print(yesterday_date, yesterday_low, current_low)
+		msg = msg+'Rule 1 '+symbol
+	return msg
+
+def check_rule2(today_minute_data, symbol):
 	#If Today's current_low falls below yesterday's low
 	# & I know Today High Low would be atleast 1%
 	# & with yesterday low - today-low correlation of .99 and 20 percent chance of diff being less than 0.5%
 	# & I know even If Today's High is already higher than yesterday's low - I would cover 1% tommorow
-	yesterday_low = 0
-	current_low = float(today_minute_data.iloc[0]['low'])
-	print(yesterday_low, current_low)
+	msg = 'Empty Rule Check'
+	return msg
 
 def performStreamingOperation(time):
+	print("**********************************************************************")
 	msg = ''
 	for symbol in symbols :
 		print "Get Data for "+symbol+" - for - "+datetime.datetime.strftime(time,'%d-%m-%Y-%H-%M')
 		inputjson =  ghdp.GoogleIntradayQuote(symbol,60,1)
 		x = [i.split(',') for i in inputjson.to_csv().split()]
 		today_minute_data = pandas.DataFrame.from_records(x,columns=['symbol','date','time','open','high','low','close','volume'])
-		check_rule1(today_minute_data)
+		msg = msg+check_rule1(today_minute_data, symbol)
+		msg = msg+check_rule2(today_minute_data, symbol)
 	if enable_sms:
 		q.send( phone_number, msg )
 ###############################################################################################################
