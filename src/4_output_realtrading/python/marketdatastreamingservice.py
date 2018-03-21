@@ -62,9 +62,10 @@ def check_rule1(today_minute_data, symbol):
 	yesterday_date = daywisedata[daywisedata.symbol == symbol].iloc[-1]['date'] 
 	yesterday_low = float(daywisedata[daywisedata.symbol == symbol].iloc[-1]['low'])
 	current_low = float(today_minute_data.iloc[-1]['low'])
+	print(" Rule1 ",yesterday_date, yesterday_low, current_low)
 	if yesterday_low*0.995 > current_low:
-		print(yesterday_date, yesterday_low, current_low)
-		msg = msg+'Rule 1 '+symbol
+		#print(yesterday_date, yesterday_low, current_low)
+		msg = msg+' Rule1 - BuyNow -'+symbol+","
 	return msg
 
 def check_rule2(today_minute_data, symbol):
@@ -72,7 +73,7 @@ def check_rule2(today_minute_data, symbol):
 	# & I know Today High Low would be atleast 1%
 	# & with yesterday low - today-low correlation of .99 and 20 percent chance of diff being less than 0.5%
 	# & I know even If Today's High is already higher than yesterday's low - I would cover 1% tommorow
-	msg = 'Empty Rule Check'
+	msg = ''
 	return msg
 
 def performStreamingOperation(time):
@@ -85,6 +86,7 @@ def performStreamingOperation(time):
 		today_minute_data = pandas.DataFrame.from_records(x,columns=['symbol','date','time','open','high','low','close','volume'])
 		msg = msg+check_rule1(today_minute_data, symbol)
 		msg = msg+check_rule2(today_minute_data, symbol)
+	print(msg)
 	if enable_sms:
 		q.send( phone_number, msg )
 ###############################################################################################################
@@ -97,22 +99,32 @@ current_time = datetime.datetime.now()
 last_minute_handled = -1
 counter = 0
 
+trading_started = False
+intraday_ended = False
+interday_ended = False
 while(True) :
 	while ((current_time >= market_start) & (current_time <= market_interday_end) or bypass_trading_window):
-		if current_time == market_start:
-			print "Market Opened for trading"
-			if enable_sms:
-				q.send( phone_number, 'Market Opened for trading' )
-		if current_time == market_intraday_end:
-			print "Market Closing for Intradday trading"
-			if enable_sms:
-				q.send( phone_number, 'Market Closing for Intradday trading' )
-			break
-		if current_time == market_interday_end:
-			print "Market Closing for Interday trading"
-			if enable_sms:
-				q.send( phone_number, 'Market Closing for Interday trading' )
-			break
+		if current_time >= market_start:
+			if not trading_started & (not interday_ended):
+				trading_started = True
+				print "Market Opened for trading"
+				if enable_sms:
+					q.send( phone_number, 'Market Opened for trading' )
+		if current_time >= market_intraday_end:
+			if trading_started & (not intraday_ended):
+				intraday_ended = True
+				print "Market Closing for Intradday trading"
+				if enable_sms:
+					q.send( phone_number, 'Market Closing for Intradday trading' )
+		if current_time >= market_interday_end:
+			if trading_started & (not interday_ended):
+				interday_ended = True
+				intraday_ended = True
+				trading_started = True
+				print "Market Closing for Interday trading"
+				if enable_sms:
+					q.send( phone_number, 'Market Closing for Interday trading' )
+				break
 
 		if counter > last_minute_handled:
 			try:
