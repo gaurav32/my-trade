@@ -1,4 +1,4 @@
-cd ../src/3_processer/analytics
+cd ../src/3_analytics
 echo "################################## Starting Application ###########################"
 Rscript shinyapp.R 
-cd ../../../bin
+cd ../../bin
