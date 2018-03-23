@@ -7,6 +7,7 @@ import way2sms
 import sys
 sys.path.append('../../1_input_marketdatafetcher/')
 import google_history_data_parser as ghdp
+import nse_option_data_parser as nodp
 ###############################################################################################################
 today_time = datetime.datetime.now()
 today_daystart_time = today_time.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -51,6 +52,15 @@ os.chdir("../minutewise/")
 minutewisedata = load90DayMinuteWiseData(symbols)
 os.chdir("../../../")
 ###############################################################################################################
+def options_check_rule1(options_current_data):
+	#If Today's current_low falls below yesterday's low
+	# & I know Today High Low would be atleast 1%
+	# & with yesterday low - today-low correlation of .99 and 20 percent chance of diff being less than 0.5%
+	# & I know even If Today's High is already higher than yesterday's low - I would cover 1% tommorow
+	print(options_current_data.head(2))
+	msg = ''
+	return msg
+
 def check_rule1(today_minute_data, symbol):
 	#If Today's current_low falls below yesterday's low
 	# & I know Today High Low would be atleast 1%
@@ -73,12 +83,17 @@ def check_rule2(today_minute_data, symbol):
 	# & I know Today High Low would be atleast 1%
 	# & with yesterday low - today-low correlation of .99 and 20 percent chance of diff being less than 0.5%
 	# & I know even If Today's High is already higher than yesterday's low - I would cover 1% tommorow
+	print(today_minute_data.tail(1))
 	msg = ''
 	return msg
 
 def performStreamingOperation(time):
 	print("**********************************************************************")
 	msg = ''
+
+	options_current_data = nodp.NseOptionsData()
+	msg = msg+options_check_rule1(options_current_data)
+
 	for symbol in symbols :
 		print "Get Data for "+symbol+" - for - "+datetime.datetime.strftime(time,'%d-%m-%Y-%H-%M')
 		inputjson =  ghdp.GoogleIntradayQuote(symbol,60,1)
