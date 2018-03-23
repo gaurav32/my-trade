@@ -52,12 +52,22 @@ os.chdir("../minutewise/")
 minutewisedata = load90DayMinuteWiseData(symbols)
 os.chdir("../../../")
 ###############################################################################################################
+call_option_chosen = 10000
+put_option_chosen = 7000
+starting_strikeprice_chosen = True
 def options_check_rule1(options_current_data):
 	#If Today's current_low falls below yesterday's low
 	# & I know Today High Low would be atleast 1%
 	# & with yesterday low - today-low correlation of .99 and 20 percent chance of diff being less than 0.5%
 	# & I know even If Today's High is already higher than yesterday's low - I would cover 1% tommorow
-	print(options_current_data.head(2))
+	global starting_strikeprice_chosen 
+
+	if starting_strikeprice_chosen :
+		starting_strikeprice_chosen = False
+		#call_option_chosen = options_current_data.head(1)['CALL_LTP']
+		print("Today OPTIONS Trade -Start- CALL_StrikePrice:{0} PUT_StrikePrice:{1}".format(call_option_chosen,put_option_chosen))
+	#print(options_current_data[options_current_data['Strike Price'] == 9800][['Strike Price','PUT_LTP']])
+	#print(options_current_data[options_current_data['Strike Price'] == 10300][['Strike Price','CALL_LTP']])
 	msg = ''
 	return msg
 
@@ -86,14 +96,14 @@ def check_rule2(today_minute_data, symbol):
 	print(today_minute_data.tail(1))
 	msg = ''
 	return msg
-
+###############################################################################################################
 def performStreamingOperation(time):
 	print("**********************************************************************")
 	msg = ''
-
+	############################################################################
 	options_current_data = nodp.NseOptionsData()
 	msg = msg+options_check_rule1(options_current_data)
-
+	############################################################################
 	for symbol in symbols :
 		print "Get Data for "+symbol+" - for - "+datetime.datetime.strftime(time,'%d-%m-%Y-%H-%M')
 		inputjson =  ghdp.GoogleIntradayQuote(symbol,60,1)
@@ -101,58 +111,65 @@ def performStreamingOperation(time):
 		today_minute_data = pandas.DataFrame.from_records(x,columns=['symbol','date','time','open','high','low','close','volume'])
 		msg = msg+check_rule1(today_minute_data, symbol)
 		msg = msg+check_rule2(today_minute_data, symbol)
+	############################################################################
 	print(msg)
 	if enable_sms:
 		q.send( phone_number, msg )
-###############################################################################################################
+
 def getTradingMarketMinute(time):
 	diff = time - today_daystart_time
 	elapsed_ms = (diff.days * 86400000) + (diff.seconds * 1000) + (diff.microseconds / 1000)
 	return int(elapsed_ms/(1000*60))
 
-current_time = datetime.datetime.now()
-last_minute_handled = -1
-counter = 0
+def startStreamingApp():
 
-trading_started = False
-intraday_ended = False
-interday_ended = False
-while(True) :
-	while ((current_time >= market_start) & (current_time <= market_interday_end) or bypass_trading_window):
-		if current_time >= market_start:
-			if not trading_started & (not interday_ended):
-				trading_started = True
-				print "Market Opened for trading"
-				if enable_sms:
-					q.send( phone_number, 'Market Opened for trading' )
-		if current_time >= market_intraday_end:
-			if trading_started & (not intraday_ended):
-				intraday_ended = True
-				print "Market Closing for Intradday trading"
-				if enable_sms:
-					q.send( phone_number, 'Market Closing for Intradday trading' )
-		if current_time >= market_interday_end:
-			if trading_started & (not interday_ended):
-				interday_ended = True
-				intraday_ended = True
-				trading_started = True
-				print "Market Closing for Interday trading"
-				if enable_sms:
-					q.send( phone_number, 'Market Closing for Interday trading' )
-				break
+	current_time = datetime.datetime.now()
+	last_minute_handled = -1
+	counter = 0
 
-		if counter > last_minute_handled:
-			try:
-				performStreamingOperation(current_time)
-				last_minute_handled = getTradingMarketMinute(current_time)
-			except ValueError:
-	    			print("Oops!  That was no valid number.  Try again...")
+	trading_started = False
+	intraday_ended = False
+	interday_ended = False
 
-		#reset time
-		current_time = datetime.datetime.now()
-		counter = getTradingMarketMinute(current_time)
-	if current_time > market_interday_end :
-		break
+	while(True) :
+		while ((current_time >= market_start) & (current_time <= market_interday_end) or bypass_trading_window):
+			if current_time >= market_start:
+				if not trading_started & (not interday_ended):
+					trading_started = True
+					print "Market Opened for trading"
+					if enable_sms:
+						q.send( phone_number, 'Market Opened for trading' )
+			if current_time >= market_intraday_end:
+				if trading_started & (not intraday_ended):
+					intraday_ended = True
+					print "Market Closing for Intradday trading"
+					if enable_sms:
+						q.send( phone_number, 'Market Closing for Intradday trading' )
+			if current_time >= market_interday_end:
+				if trading_started & (not interday_ended):
+					interday_ended = True
+					intraday_ended = True
+					trading_started = True
+					print "Market Closing for Interday trading"
+					if enable_sms:
+						q.send( phone_number, 'Market Closing for Interday trading' )
+					break
 
-q.logout()
+			if counter > last_minute_handled:
+				try:
+					performStreamingOperation(current_time)
+					last_minute_handled = getTradingMarketMinute(current_time)
+				except ValueError:
+	    				print("Oops!  That was no valid number.  Try again...")
+
+			#reset time
+			current_time = datetime.datetime.now()
+			counter = getTradingMarketMinute(current_time)
+		if current_time > market_interday_end :
+			break
+
+	q.logout()
+###############################################################################################################
+if __name__ == '__main__':
+  	startStreamingApp()
 ###############################################################################################################
