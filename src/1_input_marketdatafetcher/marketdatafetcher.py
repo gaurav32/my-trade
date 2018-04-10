@@ -28,11 +28,11 @@ datadumpminutewisepath = os.environ.get('TRADING_SOFTWARE')+"/src/2_datadump/dat
 ############################################################################################################
 filelist = [ f for f in os.listdir(datadumppath) if f.endswith(".csv") ]
 for f in filelist:
-    print datadumppath+f
+    #print datadumppath+f
     os.remove(datadumppath+f)
 
 for symbol in symbols :
-	#print symbol
+	print symbol
 	filename = datadumppath+"New_nifty50_"+symbol+".csv"
 	#inputjson =  ghdp.GoogleIntradayQuote(symbol,86400,360)
 	inputjson =  ghdp.GoogleInterdayQuote(symbol,86400,1)
@@ -43,11 +43,11 @@ for symbol in symbols :
 ############################################################################################################
 filelist = [ f for f in os.listdir(datadumpminutewisepath) if f.endswith(".csv") ]
 for f in filelist:
-    print datadumpminutewisepath+f
+    #print datadumpminutewisepath+f
     os.remove(datadumpminutewisepath+f)
     
 for symbol in symbols :
-	#print symbol
+	print symbol
 	filename = datadumpminutewisepath+"Today_Yesterday_nifty50_"+symbol+".csv"
 	#inputjson =  ghdp.GoogleIntradayQuote(symbol,86400,360)
 	inputjson =  ghdp.GoogleIntradayQuote(symbol,60,90)
