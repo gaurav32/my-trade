@@ -5,7 +5,7 @@ import json
 import os
 import way2sms
 import sys
-sys.path.append('../../1_input_marketdatafetcher/')
+sys.path.append(os.environ.get('TRADING_SOFTWARE')+'/src/1_input_marketdatafetcher/dataparsers/')
 import google_history_data_parser as ghdp
 import nse_option_data_parser as nodp
 ###############################################################################################################
