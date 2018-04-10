@@ -1,7 +1,4 @@
-cd ../src/1_input_marketdatafetcher
+cd $TRADING_SOFTWARE/src/1_input_marketdatafetcher
 echo "################################## Fetching Market Data..Please wait ###########################"
-python marketdatafetcherdaily19sep.py
-cd ../../bin
-cd ../src/1_input_marketdatafetcher
-python WorldStockIndexTimelineFetcher.py
-cd ../../bin
+python marketdatafetcher.py
+cd $TRADING_SOFTWARE/bin

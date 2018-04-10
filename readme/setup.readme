@@ -1,0 +1,7 @@
+Install git
+Go to the directory where you want to checkout the software code
+Checkout the code from https://github.com/gaurav32/my-trade.git
+	extecute "git clone https://github.com/gaurav32/my-trade.git"
+Execute setup.sh in bin directory of my-trade
+	Install all python R and other thirdparty software dependencies
+
